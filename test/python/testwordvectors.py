@@ -23,7 +23,7 @@ class TestWordVectors(unittest.TestCase):
         path = os.path.join(tempfile.gettempdir(), "vectors")
 
         # Save model path
-        cls.path = path + ".magnitude"
+        cls.path = f"{path}.magnitude"
 
         # Build word vectors
         WordVectors.build("README.md", 300, 3, path)

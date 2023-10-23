@@ -45,12 +45,11 @@ class ANN(object):
             model = Annoy(config)
         elif backend == "hnsw":
             model = HNSW(config)
-        else:
-            # Raise error if trying to create a Faiss index without Faiss installed
-            if not FAISS:
-                raise ImportError("Faiss library is not installed")
-
+        elif FAISS:
             model = Faiss(config)
+
+        else:
+            raise ImportError("Faiss library is not installed")
 
         # Store config back
         config["backend"] = backend
@@ -165,12 +164,10 @@ class Faiss(ANN):
         self.model.nprobe = 6
         scores, ids = self.model.search(queries, limit)
 
-        # Map results to [(id, score)]
-        results = []
-        for x, score in enumerate(scores):
-            results.append(list(zip(ids[x].tolist(), score.tolist())))
-
-        return results
+        return [
+            list(zip(ids[x].tolist(), score.tolist()))
+            for x, score in enumerate(scores)
+        ]
 
     def save(self, path):
         # Write index

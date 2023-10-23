@@ -251,10 +251,7 @@ class API(object):
             list of (id, score) per text element
         """
 
-        if self.labels:
-            return self.labels(text, labels)
-
-        return None
+        return self.labels(text, labels) if self.labels else None
 
 class Factory(object):
     """

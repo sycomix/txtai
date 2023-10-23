@@ -134,8 +134,9 @@ class Scoring(object):
 
         # Boost weights of tag tokens to match the largest weight in the list
         if self.tags:
-            tags = {token: self.tags[token] for token in tokens if token in self.tags}
-            if tags:
+            if tags := {
+                token: self.tags[token] for token in tokens if token in self.tags
+            }:
                 maxWeight = max(weights)
                 maxTag = max(tags.values())
 
@@ -152,7 +153,7 @@ class Scoring(object):
             path: directory path to load model
         """
 
-        with open("%s/scoring" % path, "rb") as handle:
+        with open(f"{path}/scoring", "rb") as handle:
             self.__dict__.update(pickle.load(handle))
 
     def save(self, path):
@@ -163,7 +164,7 @@ class Scoring(object):
             path: directory path to save model
         """
 
-        with open("%s/scoring" % path, "wb") as handle:
+        with open(f"{path}/scoring", "wb") as handle:
             pickle.dump(self.__dict__, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def computeIDF(self, freq):

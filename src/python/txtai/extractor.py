@@ -79,8 +79,7 @@ class Extractor(object):
         # Tokenize text
         segments, tokenlist = [], []
         for text in texts:
-            tokens = self.tokenizer.tokenize(text)
-            if tokens:
+            if tokens := self.tokenizer.tokenize(text):
                 segments.append(text)
                 tokenlist.append(tokens)
 
@@ -109,8 +108,13 @@ class Extractor(object):
                 # Add result if:
                 #   - all required tokens are present or there are not required tokens AND
                 #   - all prohibited tokens are not present or there are not prohibited tokens
-                if (not must or all([token.lower() in text.lower() for token in must])) and \
-                   (not mnot or all([token.lower() not in text.lower() for token in mnot])):
+                if (
+                    not must
+                    or all(token.lower() in text.lower() for token in must)
+                ) and (
+                    not mnot
+                    or all(token.lower() not in text.lower() for token in mnot)
+                ):
                     matches.append(segments[x] + (score,))
 
             # Add query matches sorted by highest score

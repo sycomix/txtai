@@ -224,9 +224,7 @@ class Embeddings(object):
         # Search embeddings index
         results = self.embeddings.search(embeddings, limit)
 
-        # Map ids if id mapping available
-        lookup = self.config.get("ids")
-        if lookup:
+        if lookup := self.config.get("ids"):
             results = [[(lookup[i], score) for i, score in r] for r in results]
 
         return results
@@ -285,7 +283,7 @@ class Embeddings(object):
         """
 
         # Index configuration
-        with open("%s/config" % path, "rb") as handle:
+        with open(f"{path}/config", "rb") as handle:
             self.config = pickle.load(handle)
 
             # Build full path to embedding vectors file
@@ -294,11 +292,11 @@ class Embeddings(object):
 
         # Sentence embeddings index
         self.embeddings = ANN.create(self.config)
-        self.embeddings.load("%s/embeddings" % path)
+        self.embeddings.load(f"{path}/embeddings")
 
         # Dimensionality reduction
         if self.config.get("pca"):
-            with open("%s/lsa" % path, "rb") as handle:
+            with open(f"{path}/lsa", "rb") as handle:
                 self.lsa = pickle.load(handle)
 
         # Embedding scoring
@@ -317,28 +315,29 @@ class Embeddings(object):
             path: output directory path
         """
 
-        if self.config:
-            # Create output directory, if necessary
-            os.makedirs(path, exist_ok=True)
+        if not self.config:
+            return
+        # Create output directory, if necessary
+        os.makedirs(path, exist_ok=True)
 
-            # Copy vectors file
-            if self.config.get("storevectors"):
-                shutil.copyfile(self.config["path"], os.path.join(path, os.path.basename(self.config["path"])))
+        # Copy vectors file
+        if self.config.get("storevectors"):
+            shutil.copyfile(self.config["path"], os.path.join(path, os.path.basename(self.config["path"])))
 
-                self.config["path"] = os.path.basename(self.config["path"])
+            self.config["path"] = os.path.basename(self.config["path"])
 
             # Write index configuration
-            with open("%s/config" % path, "wb") as handle:
-                pickle.dump(self.config, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"{path}/config", "wb") as handle:
+            pickle.dump(self.config, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
             # Write sentence embeddings index
-            self.embeddings.save("%s/embeddings" % path)
+        self.embeddings.save(f"{path}/embeddings")
 
             # Save dimensionality reduction
-            if self.lsa:
-                with open("%s/lsa" % path, "wb") as handle:
-                    pickle.dump(self.lsa, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        if self.lsa:
+            with open(f"{path}/lsa", "wb") as handle:
+                pickle.dump(self.lsa, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-            # Save embedding scoring
-            if self.scoring:
-                self.scoring.save(path)
+        # Save embedding scoring
+        if self.scoring:
+            self.scoring.save(path)

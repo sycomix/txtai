@@ -114,11 +114,13 @@ class Labels(Pipeline):
         if not isinstance(results, list):
             results = [results]
 
-        # Build list of (id, score)
-        scores = []
-        for result in results:
-            scores.append([(labels.index(label), result["scores"][x]) for x, label in enumerate(result["labels"])])
-
+        scores = [
+            [
+                (labels.index(label), result["scores"][x])
+                for x, label in enumerate(result["labels"])
+            ]
+            for result in results
+        ]
         return scores[0] if isinstance(text, str) else scores
 
 class Similarity(Labels):
